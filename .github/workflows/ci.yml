@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Release
+            flags: -DCMAKE_BUILD_TYPE=Release
+          - name: ASan + UBSan
+            flags: -DCMAKE_BUILD_TYPE=Debug -DENABLE_ASAN=ON
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Конфигурация
+        run: cmake -S . -B build ${{ matrix.flags }}
+
+      - name: Сборка
+        run: cmake --build build --parallel
+
+      - name: Без склейки — 16 решений
+        run: echo no | ./build/bdd_einstein | tee out.txt && grep -q "RESULT: 16 solutions" out.txt
+
+      - name: Со склейкой — 4 решения
+        run: echo yes | ./build/bdd_einstein | tee out.txt && grep -q "RESULT: 4 solutions" out.txt
