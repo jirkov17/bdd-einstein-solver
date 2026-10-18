@@ -33,7 +33,11 @@ jobs:
         run: cmake --build build --parallel
 
       - name: Без склейки — 16 решений
-        run: echo no | ./build/bdd_einstein | tee out.txt && grep -q "RESULT: 16 solutions" out.txt
+        run: |
+          echo no | ./build/bdd_einstein | tee out.txt
+          grep -q "RESULT: 16 solutions" out.txt
 
       - name: Со склейкой — 4 решения
-        run: echo yes | ./build/bdd_einstein | tee out.txt && grep -q "RESULT: 4 solutions" out.txt
+        run: |
+          echo yes | ./build/bdd_einstein | tee out.txt
+          grep -q "RESULT: 4 solutions" out.txt
