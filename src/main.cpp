@@ -123,7 +123,9 @@ void cond_3(bdd& task, bdd p[M][N][N], unsigned kCurrent, unsigned jCurrent, uns
       }
     }
     else { //со склейкой
-      for (unsigned i = 0; i < N; i++) {
+      // У верхнего ряда нет соседа справа-сверху: цикл начинается с i = SIDE.
+      // Раньше он начинался с 0, и индекс i - SIDE + 1 уходил за границы массива.
+      for (unsigned i = SIDE; i < N; i++) {
         if (i % SIDE == SIDE - 1) {
           cond_3 &= !(p[kCurrent][i][jCurrent] ^ p[kNei][i - 2 * SIDE + 1][jNei]);
         }
@@ -173,7 +175,7 @@ void cond_6(bdd& task, bdd p[M][N][N])
   }
 }
 
-void main(void) {
+int main() {
 
   bdd_init(100000, 10000);
   bdd_setvarnum(N_VAR);
@@ -250,4 +252,5 @@ void main(void) {
   std::cout << satcount << " solutions:\n" << std::endl;
   if (satcount) bdd_allsat(task, fun);
   bdd_done();
+  return 0;
 }
